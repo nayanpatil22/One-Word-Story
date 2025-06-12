@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One Word Story</title>
+  <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="max-w-2xl mx-auto p-6">
+    <h1 class="text-4xl font-bold text-center mb-4">📜 The One Word Story</h1>
+    <p class="text-center text-sm mb-8">Pay ₹5 and add one word to this public story. One word. Infinite chaos.</p>
+
+    <div id="story" class="bg-white p-4 rounded shadow text-xl leading-relaxed mb-6 min-h-[100px]">
+      hello
+    </div>
+
+    <form id="wordForm" class="bg-white p-4 rounded shadow space-y-4">
+      <input type="text" id="wordInput" name="word" maxlength="200" placeholder="Enter your word(s)" required class="w-full p-2 border rounded">
+      <input type="text" id="upiInput" name="upi" placeholder="Your UPI ID or Payment Ref (optional)" class="w-full p-2 border rounded">
+      <button type="submit" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Submit Word</button>
+      <p class="text-sm text-gray-600 text-center">If submitting multiple words, separate them with spaces. Pay ₹5 per word.</p>
+      <p class="text-sm text-gray-500 text-center">UPI: <strong>yourupi@bank</strong> (Send ₹5 per word, then submit)</p>
+    </form>
+
+    <p class="mt-6 text-xs text-center text-gray-400">Built with hope • Inspired by chaos</p>
+  </div>
+
+  <script>
+    const storyEl = document.getElementById('story');
+    const form = document.getElementById('wordForm');
+
+    const sheetAPI = 'https://sheetdb.io/api/v1/z7csfs8kap1cj';
+
+    async function loadStory() {
+      try {
+        const res = await axios.get(sheetAPI);
+        const words = res.data.map(row => row.word).join(' ');
+        storyEl.innerText = words || 'No words yet.';
+      } catch (err) {
+        storyEl.innerText = 'Failed to load story 😢';
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const wordInput = document.getElementById('wordInput').value.trim();
+      const upi = document.getElementById('upiInput').value.trim();
+
+      if (!wordInput) return;
+
+      const words = wordInput.split(' ').map(w => w.trim()).filter(Boolean);
+
+      try {
+        for (let word of words) {
+          await axios.post(sheetAPI, {
+            data: { word, upi }
+          });
+        }
+        form.reset();
+        loadStory();
+        alert('Words submitted!');
+      } catch (err) {
+        alert('Failed to submit. Try again.');
+      }
+    });
+
+    loadStory();
+  </script>
+</body>
+</html>
