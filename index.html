@@ -34,14 +34,17 @@
     const sheetAPI = 'https://sheetdb.io/api/v1/z7csfs8kap1cj';
 
     async function loadStory() {
-      try {
-        const res = await axios.get(sheetAPI);
-        const words = res.data.map(row => row.word).join(' ');
-        storyEl.innerText = words || 'No words yet.';
-      } catch (err) {
-        storyEl.innerText = 'Failed to load story 😢';
-      }
-    }
+  try {
+    const res = await axios.get(sheetAPI);
+    console.log('✅ SheetDB response:', res.data);  // Add this
+    const words = res.data.map(row => row.word).join(' ');
+    storyEl.innerText = words || 'No words yet.';
+  } catch (err) {
+    console.error('❌ Error fetching data:', err);  // Add this
+    storyEl.innerText = 'Failed to load story 😢';
+  }
+}
+
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
